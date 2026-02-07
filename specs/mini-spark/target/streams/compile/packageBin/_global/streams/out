@@ -1,0 +1,41 @@
+[debug] Packaging /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/mini-spark_2.12-0.1.0.jar ...
+[debug] Input file mappings:
+[debug] 	mini
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini
+[debug] 	mini/spark
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark
+[debug] 	mini/spark/TaskContext.class
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/TaskContext.class
+[debug] 	mini/spark/SparkContext.class
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/SparkContext.class
+[debug] 	mini/spark/rdd
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/rdd
+[debug] 	mini/spark/rdd/FlatMapRDD.class
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/rdd/FlatMapRDD.class
+[debug] 	mini/spark/rdd/FilterRDD.class
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/rdd/FilterRDD.class
+[debug] 	mini/spark/rdd/ParallelCollectionPartition$.class
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/rdd/ParallelCollectionPartition$.class
+[debug] 	mini/spark/rdd/MapRDD.class
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/rdd/MapRDD.class
+[debug] 	mini/spark/rdd/ParallelCollectionPartition.class
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/rdd/ParallelCollectionPartition.class
+[debug] 	mini/spark/rdd/ParallelCollectionRDD.class
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/rdd/ParallelCollectionRDD.class
+[debug] 	mini/spark/rdd/ParallelCollectionRDD$.class
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/rdd/ParallelCollectionRDD$.class
+[debug] 	mini/spark/rdd/RDD.class
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/rdd/RDD.class
+[debug] 	mini/spark/examples
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/examples
+[debug] 	mini/spark/examples/WordCountLocal$.class
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/examples/WordCountLocal$.class
+[debug] 	mini/spark/examples/WordCountLocal.class
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/examples/WordCountLocal.class
+[debug] 	mini/spark/SparkContext$.class
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/SparkContext$.class
+[debug] 	mini/spark/TaskContext$.class
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/TaskContext$.class
+[debug] 	mini/spark/Partition.class
+[debug] 	  /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes/mini/spark/Partition.class
+[debug] Done packaging.
