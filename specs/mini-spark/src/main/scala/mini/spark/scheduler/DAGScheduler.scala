@@ -16,8 +16,12 @@ class DAGScheduler(sc: SparkContext) extends Serializable {
     completedStages.clear()
     val resultStage = createResultStage(rdd)
     lastJobStages = collectStages(resultStage)
-    val results = runResultStage(resultStage, func)
-    results.toArray
+    try {
+      val results = runResultStage(resultStage, func)
+      results.toArray
+    } finally {
+      sc.cleanupShuffle()
+    }
   }
 
   def getLastJobStages: Seq[Stage] = lastJobStages

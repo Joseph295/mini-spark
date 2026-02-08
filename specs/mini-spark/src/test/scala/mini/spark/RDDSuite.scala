@@ -2,6 +2,7 @@ package mini.spark
 
 import mini.spark.rdd.RDD._
 import mini.spark.shuffle.SimpleShuffleManager
+import mini.spark.storage.{RDDPartitionBlockId, StorageLevel}
 import org.scalatest.funsuite.AnyFunSuite
 
 class RDDSuite extends AnyFunSuite {
@@ -47,6 +48,159 @@ class RDDSuite extends AnyFunSuite {
     assert(result.nonEmpty)
   }
 
+  test("cache hit avoids recompute") {
+    val sc = new SparkContext
+    var counter = 0
+
+    val rdd = sc
+      .parallelize(Seq(1, 2, 3), numSlices = 1)
+      .map { x =>
+        counter += 1
+        x
+      }
+      .persist(StorageLevel.MEMORY_ONLY)
+
+    val first = rdd.collect()
+    val second = rdd.collect()
+
+    assert(first.sameElements(second))
+    assert(counter == 3)
+  }
+
+  test("spill to disk when memory is insufficient") {
+    val sc = new SparkContext(maxMemoryBytes = 1)
+    var counter = 0
+
+    val rdd = sc
+      .parallelize(Seq(1, 2, 3), numSlices = 1)
+      .map { x =>
+        counter += 1
+        x
+      }
+      .persist(StorageLevel.MEMORY_AND_DISK)
+
+    val first = rdd.collect()
+    val second = rdd.collect()
+
+    assert(first.sameElements(second))
+    assert(counter == 3)
+
+    val blockId = RDDPartitionBlockId(rdd.id, 0)
+    assert(sc.blockManager.memoryStore.get(blockId).isEmpty)
+    assert(sc.blockManager.diskStore.get(blockId).nonEmpty)
+  }
+
+  test("task retry succeeds after failure") {
+    val sc = new SparkContext
+    val base = sc.parallelize(Seq(1, 2, 3), numSlices = 1)
+
+    class FailOnceRDD(prev: mini.spark.rdd.RDD[Int]) extends mini.spark.rdd.RDD[Int](prev.sc) {
+      override def partitions: Array[Partition] = prev.partitions
+      override def dependencies: Seq[Dependency[_]] = Seq(new NarrowDependency(prev))
+
+      override protected def compute(partition: Partition, context: TaskContext): Iterator[Int] = {
+        if (partition.index == 0 && context.attemptId == 0) {
+          throw new RuntimeException("Injected failure")
+        }
+        prev.iterator(partition, context)
+      }
+    }
+
+    val rdd = new FailOnceRDD(base)
+    val result = rdd.collect()
+    assert(result.sameElements(Array(1, 2, 3)))
+  }
+
+  test("cache retry does not commit failed attempt") {
+    val sc = new SparkContext(maxTaskAttempts = 2)
+    var counter = 0
+
+    val base = sc
+      .parallelize(Seq(1, 2, 3), numSlices = 1)
+      .map { x =>
+        counter += 1
+        x
+      }
+      .persist(StorageLevel.MEMORY_ONLY)
+
+    class FailOnceRDD(prev: mini.spark.rdd.RDD[Int]) extends mini.spark.rdd.RDD[Int](prev.sc) {
+      override def partitions: Array[Partition] = prev.partitions
+      override def dependencies: Seq[Dependency[_]] = Seq(new NarrowDependency(prev))
+
+      override protected def compute(partition: Partition, context: TaskContext): Iterator[Int] = {
+        val data = prev.iterator(partition, context).toVector
+        if (context.attemptId == 0) {
+          throw new RuntimeException("Injected cache failure")
+        }
+        data.iterator
+      }
+    }
+
+    val failing = new FailOnceRDD(base)
+    val result = failing.collect()
+    assert(result.sameElements(Array(1, 2, 3)))
+    assert(counter == 6)
+
+    val cached = base.collect()
+    assert(cached.sameElements(Array(1, 2, 3)))
+    assert(counter == 6)
+  }
+
+  test("shuffle idempotent output with retry") {
+    val sc = new SparkContext
+    val data = Seq(("a", 1), ("b", 2), ("a", 3), ("b", 4))
+    val base = sc.parallelize(data, numSlices = 2)
+
+    class FailOnceRDD(prev: mini.spark.rdd.RDD[(String, Int)])
+        extends mini.spark.rdd.RDD[(String, Int)](prev.sc) {
+      override def partitions: Array[Partition] = prev.partitions
+      override def dependencies: Seq[Dependency[_]] = Seq(new NarrowDependency(prev))
+
+      override protected def compute(partition: Partition, context: TaskContext): Iterator[(String, Int)] = {
+        if (partition.index == 0 && context.attemptId == 0) {
+          throw new RuntimeException("Injected shuffle failure")
+        }
+        prev.iterator(partition, context)
+      }
+    }
+
+    val failing = new FailOnceRDD(base)
+    val reduced = failing.reduceByKey(_ + _)
+    val result = reduced.collect().toSeq.sortBy(_._1)
+    val expected = data
+      .groupBy(_._1)
+      .map { case (k, items) => (k, items.map(_._2).sum) }
+      .toSeq
+      .sortBy(_._1)
+
+    assert(result == expected)
+  }
+
+  test("explicit cleanup removes shuffle and disk cache") {
+    val sc = new SparkContext(maxMemoryBytes = 1)
+    val data = Seq(("a", 1), ("b", 2), ("a", 3))
+    val base = sc
+      .parallelize(data, numSlices = 1)
+      .map(identity)
+      .persist(StorageLevel.MEMORY_AND_DISK)
+
+    val reduced = base.reduceByKey(_ + _)
+    reduced.collect()
+
+    val dep = reduced.dependencies.head.asInstanceOf[ShuffleDependency[String, Int]]
+    val handle = dep.shuffleHandle
+    val manager = sc.shuffleManager.asInstanceOf[SimpleShuffleManager]
+    val shuffleDir = manager.getShuffleDir(handle.shuffleId)
+
+    val blockId = RDDPartitionBlockId(base.id, 0)
+    assert(sc.blockManager.diskStore.get(blockId).nonEmpty)
+    assert(!shuffleDir.exists() || Option(shuffleDir.listFiles()).getOrElse(Array.empty).isEmpty)
+
+    sc.stop()
+
+    assert(sc.blockManager.diskStore.get(blockId).isEmpty)
+  }
+
   test("parallelize respects numSlices, including non-positive") {
     val sc = new SparkContext
     val rdd2 = sc.parallelize(Seq(1, 2, 3, 4), numSlices = 2)
@@ -86,25 +240,25 @@ class RDDSuite extends AnyFunSuite {
     assert(stages.count(_.isShuffleMap) == 1)
   }
 
-  test("shuffle files and reader cover all map outputs") {
+  test("shuffle cleanup happens after job") {
     val sc = new SparkContext
     val data = Seq(("a", 1), ("b", 2), ("a", 3), ("b", 4))
     val rdd = sc.parallelize(data, numSlices = 2)
     val reduced = rdd.reduceByKey(_ + _, numPartitions = 2)
 
-    reduced.collect()
+    val result = reduced.collect().toSeq.sortBy(_._1)
+    val expected = data
+      .groupBy(_._1)
+      .map { case (k, items) => (k, items.map(_._2).sum) }
+      .toSeq
+      .sortBy(_._1)
+    assert(result == expected)
 
     val dep = reduced.dependencies.head.asInstanceOf[ShuffleDependency[String, Int]]
     val handle = dep.shuffleHandle
     val manager = sc.shuffleManager.asInstanceOf[SimpleShuffleManager]
     val dir = manager.getShuffleDir(handle.shuffleId)
     val files = Option(dir.listFiles()).getOrElse(Array.empty).filter(_.getName.contains("shuffle_"))
-
-    assert(files.length == handle.numMaps * handle.numReduces)
-
-    val reader = sc.shuffleManager.getReader[String, Int](handle, reduceId = 0)
-    val read = reader.read().toSeq
-    val expected = data.filter { case (k, _) => handle.partitioner.getPartition(k) == 0 }
-    assert(read.size == expected.size)
+    assert(files.isEmpty)
   }
 }

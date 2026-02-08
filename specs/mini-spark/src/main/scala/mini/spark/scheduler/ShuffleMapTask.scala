@@ -13,6 +13,6 @@ class ShuffleMapTask[K, V](
     val part: Partition = rdd.partitions(partitionId)
     val iter = rdd.iterator(part, context)
     val writer = rdd.sc.shuffleManager.getWriter[K, V](shuffleDep.shuffleHandle, partitionId)
-    writer.write(iter)
+    writer.write(iter, context.attemptId)
   }
 }

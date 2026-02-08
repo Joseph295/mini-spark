@@ -1,32 +1,64 @@
 [debug] [zinc] IncrementalCompile -----------
 [debug] IncrementalCompile.incrementalCompile
-[debug] previous = Stamps for: 1 products, 1 sources, 5 libraries
+[debug] previous = Stamps for: 4 products, 1 sources, 5 libraries
 [debug] current source = Set(${BASE}/src/test/scala/mini/spark/RDDSuite.scala)
-[debug] > initialChanges = InitialChanges(Changes(added = Set(), removed = Set(), changed = Set(${BASE}/src/test/scala/mini/spark/RDDSuite.scala), unmodified = ...),Set(),Set(),API Changes: Set())
+[debug] > initialChanges = InitialChanges(Changes(added = Set(), removed = Set(), changed = Set(${BASE}/src/test/scala/mini/spark/RDDSuite.scala), unmodified = ...),Set(),Set(),API Changes: Set(NamesChange(mini.spark.storage.DiskStore,ModifiedNames(changes = UsedName(ttlMs,[Default]), UsedName(mini;spark;storage;DiskStore;init;,[Default]), UsedName(touch,[Default]))), NamesChange(mini.spark.SparkContext$,ModifiedNames(changes = UsedName(mini;spark;SparkContext;init;,[Default]), UsedName(blockTtlMs,[Default]), UsedName(cleanupShuffle,[Default]), UsedName(mini;spark;SparkContext;init;default;3,[Default]), UsedName(DefaultBlockTtlMs,[Default]))), NamesChange(mini.spark.SparkContext,ModifiedNames(changes = UsedName(mini;spark;SparkContext;init;,[Default]), UsedName(blockTtlMs,[Default]), UsedName(cleanupShuffle,[Default]), UsedName(mini;spark;SparkContext;init;default;3,[Default]), UsedName(DefaultBlockTtlMs,[Default]))), NamesChange(mini.spark.storage.MemoryStore,ModifiedNames(changes = UsedName(mini;spark;storage;MemoryStore;init;,[Default]), UsedName(ttlMs,[Default])))))
+[debug] The mini.spark.storage.DiskStore has the following regular definitions changed:
+[debug] 	UsedName(ttlMs,[Default]), UsedName(mini;spark;storage;DiskStore;init;,[Default]), UsedName(touch,[Default]).
+[debug] All member reference dependencies will be considered within this context.
+[debug] Files invalidated by inheriting from (external) mini.spark.storage.DiskStore: Set()
+[debug] Now invalidating by inheritance (internally).
+[debug] Getting direct dependencies of all classes transitively invalidated by inheritance.
+[debug] Getting classes that directly depend on (external) mini.spark.storage.DiskStore.
+[debug] None of the modified names appears in source file of mini.spark.RDDSuite. This dependency is not being considered for invalidation.
+[debug] The mini.spark.SparkContext$ has the following regular definitions changed:
+[debug] 	UsedName(mini;spark;SparkContext;init;,[Default]), UsedName(blockTtlMs,[Default]), UsedName(cleanupShuffle,[Default]), UsedName(mini;spark;SparkContext;init;default;3,[Default]), UsedName(DefaultBlockTtlMs,[Default]).
+[debug] All member reference dependencies will be considered within this context.
+[debug] Files invalidated by inheriting from (external) mini.spark.SparkContext$: Set()
+[debug] Now invalidating by inheritance (internally).
+[debug] Getting direct dependencies of all classes transitively invalidated by inheritance.
+[debug] Getting classes that directly depend on (external) mini.spark.SparkContext$.
+[debug] The following modified names cause invalidation of mini.spark.RDDSuite: [mini;spark;SparkContext;init;]
+[debug] The mini.spark.SparkContext has the following regular definitions changed:
+[debug] 	UsedName(mini;spark;SparkContext;init;,[Default]), UsedName(blockTtlMs,[Default]), UsedName(cleanupShuffle,[Default]), UsedName(mini;spark;SparkContext;init;default;3,[Default]), UsedName(DefaultBlockTtlMs,[Default]).
+[debug] All member reference dependencies will be considered within this context.
+[debug] Files invalidated by inheriting from (external) mini.spark.SparkContext: Set()
+[debug] Now invalidating by inheritance (internally).
+[debug] Getting direct dependencies of all classes transitively invalidated by inheritance.
+[debug] Getting classes that directly depend on (external) mini.spark.SparkContext.
+[debug] The following modified names cause invalidation of mini.spark.RDDSuite: [mini;spark;SparkContext;init;]
+[debug] The mini.spark.storage.MemoryStore has the following regular definitions changed:
+[debug] 	UsedName(mini;spark;storage;MemoryStore;init;,[Default]), UsedName(ttlMs,[Default]).
+[debug] All member reference dependencies will be considered within this context.
+[debug] Files invalidated by inheriting from (external) mini.spark.storage.MemoryStore: Set()
+[debug] Now invalidating by inheritance (internally).
+[debug] Getting direct dependencies of all classes transitively invalidated by inheritance.
+[debug] Getting classes that directly depend on (external) mini.spark.storage.MemoryStore.
+[debug] None of the modified names appears in source file of mini.spark.RDDSuite. This dependency is not being considered for invalidation.
 [debug] 
 [debug] Initial source changes:
 [debug] 	removed: Set()
 [debug] 	added: Set()
 [debug] 	modified: Set(${BASE}/src/test/scala/mini/spark/RDDSuite.scala)
 [debug] Invalidated products: Set()
-[debug] External API changes: API Changes: Set()
+[debug] External API changes: API Changes: Set(NamesChange(mini.spark.storage.DiskStore,ModifiedNames(changes = UsedName(ttlMs,[Default]), UsedName(mini;spark;storage;DiskStore;init;,[Default]), UsedName(touch,[Default]))), NamesChange(mini.spark.SparkContext$,ModifiedNames(changes = UsedName(mini;spark;SparkContext;init;,[Default]), UsedName(blockTtlMs,[Default]), UsedName(cleanupShuffle,[Default]), UsedName(mini;spark;SparkContext;init;default;3,[Default]), UsedName(DefaultBlockTtlMs,[Default]))), NamesChange(mini.spark.SparkContext,ModifiedNames(changes = UsedName(mini;spark;SparkContext;init;,[Default]), UsedName(blockTtlMs,[Default]), UsedName(cleanupShuffle,[Default]), UsedName(mini;spark;SparkContext;init;default;3,[Default]), UsedName(DefaultBlockTtlMs,[Default]))), NamesChange(mini.spark.storage.MemoryStore,ModifiedNames(changes = UsedName(mini;spark;storage;MemoryStore;init;,[Default]), UsedName(ttlMs,[Default]))))
 [debug] Modified binary dependencies: Set()
 [debug] Initial directly invalidated classes: Set(mini.spark.RDDSuite)
 [debug] Sources indirectly invalidated by:
 [debug] 	product: Set()
 [debug] 	binary dep: Set()
-[debug] 	external source: Set()
+[debug] 	external source: Set(mini.spark.RDDSuite)
 [debug] all 1 sources are invalidated
 [debug] Initial set of included nodes: mini.spark.RDDSuite
 [debug] Recompiling all sources: number of invalidated sources > 50.0 percent of all sources
 [debug] compilation cycle 1
 [info] compiling 1 Scala source to /Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/test-classes ...
 [debug] Getting org.scala-sbt:compiler-bridge_2.12:1.12.0:compile for Scala 2.12.18
-[debug] [zinc] Running cached compiler e1d6d91 for Scala compiler version 2.12.18
+[debug] [zinc] Running cached compiler 162480ab for Scala compiler version 2.12.18
 [debug] [zinc] The Scala compiler is invoked with:
 [debug] 	-bootclasspath
 [debug] 	/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.18/scala-library-2.12.18.jar
 [debug] 	-classpath
 [debug] 	/Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/test-classes:/Users/xujunhong/github/mini-spark/specs/mini-spark/target/scala-2.12/classes:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest_2.12/3.2.18/scalatest_2.12-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-core_2.12/3.2.18/scalatest-core_2.12-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-featurespec_2.12/3.2.18/scalatest-featurespec_2.12-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-flatspec_2.12/3.2.18/scalatest-flatspec_2.12-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-freespec_2.12/3.2.18/scalatest-freespec_2.12-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-funsuite_2.12/3.2.18/scalatest-funsuite_2.12-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-funspec_2.12/3.2.18/scalatest-funspec_2.12-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-propspec_2.12/3.2.18/scalatest-propspec_2.12-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-refspec_2.12/3.2.18/scalatest-refspec_2.12-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-wordspec_2.12/3.2.18/scalatest-wordspec_2.12-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-diagrams_2.12/3.2.18/scalatest-diagrams_2.12-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-matchers-core_2.12/3.2.18/scalatest-matchers-core_2.12-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-shouldmatchers_2.12/3.2.18/scalatest-shouldmatchers_2.12-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-mustmatchers_2.12/3.2.18/scalatest-mustmatchers_2.12-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.18/scala-reflect-2.12.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-compatible/3.2.18/scalatest-compatible-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scalactic/scalactic_2.12/3.2.18/scalactic_2.12-3.2.18.jar:/Users/xujunhong/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12/2.1.0/scala-xml_2.12-2.1.0.jar
-[debug] Scala compilation took 1.615019583 s
+[debug] Scala compilation took 0.467342375 s
 [info] done compiling

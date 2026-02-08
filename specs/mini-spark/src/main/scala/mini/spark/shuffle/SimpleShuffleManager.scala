@@ -1,11 +1,11 @@
 package mini.spark.shuffle
 
 import java.io.{EOFException, File, FileInputStream, FileNotFoundException, FileOutputStream, ObjectInputStream, ObjectOutputStream}
+import java.nio.file.{Files, StandardCopyOption}
 import mini.spark.Partitioner
 import scala.collection.mutable.ArrayBuffer
 
-class SimpleShuffleManager extends ShuffleManager {
-  private val baseDir = new File("target/shuffle")
+class SimpleShuffleManager(baseDir: File) extends ShuffleManager {
   baseDir.mkdirs()
 
   override def registerShuffle(
@@ -28,17 +28,30 @@ class SimpleShuffleManager extends ShuffleManager {
   private[spark] def getShuffleDir(shuffleId: Int): File =
     new File(baseDir, s"shuffle-$shuffleId")
 
+  private[spark] def cleanupAll(): Unit = {
+    deleteRecursively(baseDir)
+    baseDir.mkdirs()
+  }
+
   private[spark] def getShuffleFile(handle: ShuffleHandle, mapId: Int, reduceId: Int): File = {
     new File(handle.shuffleDir, s"shuffle_${handle.shuffleId}_map_${mapId}_reduce_${reduceId}.data")
   }
 
+  private[spark] def getTempShuffleFile(handle: ShuffleHandle, mapId: Int, reduceId: Int, attemptId: Int): File = {
+    new File(
+      handle.shuffleDir,
+      s"shuffle_${handle.shuffleId}_map_${mapId}_reduce_${reduceId}_attempt_${attemptId}.tmp"
+    )
+  }
+
   private class SimpleShuffleWriter[K, V](handle: ShuffleHandle, mapId: Int) extends ShuffleWriter[K, V] {
-    override def write(records: Iterator[(K, V)]): Unit = {
-      val streams = Array.tabulate(handle.numReduces) { reduceId =>
-        val file = getShuffleFile(handle, mapId, reduceId)
+    override def write(records: Iterator[(K, V)], attemptId: Int): Unit = {
+      val tempFiles = Array.tabulate(handle.numReduces) { reduceId =>
+        val file = getTempShuffleFile(handle, mapId, reduceId, attemptId)
         file.getParentFile.mkdirs()
-        new ObjectOutputStream(new FileOutputStream(file))
+        file
       }
+      val streams = tempFiles.map(file => new ObjectOutputStream(new FileOutputStream(file)))
       try {
         records.foreach { case (k, v) =>
           val reduceId = handle.partitioner.getPartition(k)
@@ -46,6 +59,25 @@ class SimpleShuffleManager extends ShuffleManager {
         }
       } finally {
         streams.foreach(_.close())
+      }
+
+      var reduceId = 0
+      while (reduceId < handle.numReduces) {
+        val temp = tempFiles(reduceId)
+        val dest = getShuffleFile(handle, mapId, reduceId)
+        if (dest.exists()) dest.delete()
+        try {
+          Files.move(
+            temp.toPath,
+            dest.toPath,
+            StandardCopyOption.REPLACE_EXISTING,
+            StandardCopyOption.ATOMIC_MOVE
+          )
+        } catch {
+          case _: Exception =>
+            Files.move(temp.toPath, dest.toPath, StandardCopyOption.REPLACE_EXISTING)
+        }
+        reduceId += 1
       }
     }
   }
@@ -75,5 +107,13 @@ class SimpleShuffleManager extends ShuffleManager {
       }
       buffer.iterator
     }
+  }
+
+  private def deleteRecursively(file: File): Unit = {
+    if (file.isDirectory) {
+      val children = Option(file.listFiles()).getOrElse(Array.empty)
+      children.foreach(deleteRecursively)
+    }
+    file.delete()
   }
 }

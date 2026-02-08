@@ -1,16 +1,22 @@
-[debug] Running TaskDef(mini.spark.RDDSuite, org.scalatest.tools.Framework$$anon$1@9524f02, false, [SuiteSelector])
+[debug] Running TaskDef(mini.spark.RDDSuite, org.scalatest.tools.Framework$$anon$1@14a722ef, false, [SuiteSelector])
 [info] RDDSuite:
 [info] - map/filter/flatMap correctness
 [info] - lazy evaluation triggers only on action
 [info] - take triggers shuffle job for reduceByKey RDDs
+[info] - cache hit avoids recompute
+[info] - spill to disk when memory is insufficient
+[info] - task retry succeeds after failure
+[info] - cache retry does not commit failed attempt
+[info] - shuffle idempotent output with retry
+[info] - explicit cleanup removes shuffle and disk cache
 [info] - parallelize respects numSlices, including non-positive
 [info] - reduceByKey correctness with random input
 [info] - stage splitting produces map stage + result stage
-[info] - shuffle files and reader cover all map outputs
-[info] Run completed in 123 milliseconds.
-[info] Total number of tests run: 7
+[info] - shuffle cleanup happens after job
+[info] Run completed in 183 milliseconds.
+[info] Total number of tests run: 13
 [info] Suites: completed 1, aborted 0
-[info] Tests: succeeded 7, failed 0, canceled 0, ignored 0, pending 0
+[info] Tests: succeeded 13, failed 0, canceled 0, ignored 0, pending 0
 [info] All tests passed.
 [debug] Passed tests:
 [debug] 	mini.spark.RDDSuite
