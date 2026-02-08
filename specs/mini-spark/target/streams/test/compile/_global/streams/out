@@ -1,0 +1,4 @@
+[warn] /Users/xujunhong/github/mini-spark/specs/mini-spark/src/test/scala/mini/spark/RDDSuite.scala:3:19: imported `ShuffleDependency` is permanently hidden by definition of object ShuffleDependency in package spark
+[warn] import mini.spark.ShuffleDependency
+[warn]                   ^
+[warn] one warning found

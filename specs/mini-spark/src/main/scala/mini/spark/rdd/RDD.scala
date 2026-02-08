@@ -1,7 +1,6 @@
 package mini.spark.rdd
 
-import mini.spark.{Partition, SparkContext, TaskContext}
-import scala.collection.mutable.ArrayBuffer
+import mini.spark.{Dependency, Partition, SparkContext, TaskContext}
 import scala.reflect.ClassTag
 
 abstract class RDD[T](val sc: SparkContext) extends Serializable {
@@ -9,7 +8,7 @@ abstract class RDD[T](val sc: SparkContext) extends Serializable {
 
   protected def compute(partition: Partition, context: TaskContext): Iterator[T]
 
-  private[spark] def dependencies: Seq[RDD[_]] = Seq.empty
+  def dependencies: Seq[Dependency[_]] = Seq.empty
 
   final private[spark] def iterator(partition: Partition, context: TaskContext): Iterator[T] =
     compute(partition, context)
@@ -38,22 +37,11 @@ abstract class RDD[T](val sc: SparkContext) extends Serializable {
   }
 
   def take(n: Int)(implicit ct: ClassTag[T]): Array[T] = {
-    if (n <= 0) {
-      Array.empty[T]
-    } else {
-      val buf = new ArrayBuffer[T](n)
-      val parts = partitions
-      var i = 0
-      while (i < parts.length && buf.length < n) {
-        val part = parts(i)
-        val context = TaskContext(part.index)
-        val it = iterator(part, context)
-        while (it.hasNext && buf.length < n) {
-          buf += it.next()
-        }
-        i += 1
-      }
-      buf.toArray
-    }
+    if (n <= 0) Array.empty[T] else collect().take(n)
   }
+}
+
+object RDD {
+  implicit def rddToPairRDDFunctions[K, V](rdd: RDD[(K, V)]): PairRDDFunctions[K, V] =
+    new PairRDDFunctions(rdd)
 }

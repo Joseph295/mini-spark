@@ -1,1 +1,1 @@
-["mini.spark.examples.WordCountLocal"]
+["mini.spark.examples.WordCount","mini.spark.examples.WordCountLocal"]

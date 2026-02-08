@@ -1,25 +1,22 @@
 package mini.spark
 
 import mini.spark.rdd.{ParallelCollectionRDD, RDD}
+import mini.spark.scheduler.{DAGScheduler, TaskScheduler, TaskSchedulerImpl}
+import mini.spark.shuffle.{ShuffleManager, SimpleShuffleManager}
 import scala.reflect.ClassTag
 
 class SparkContext {
+  private[spark] val shuffleManager: ShuffleManager = new SimpleShuffleManager
+  private[spark] val taskScheduler: TaskScheduler = new TaskSchedulerImpl
+  private[spark] val dagScheduler: DAGScheduler = new DAGScheduler(this)
+
   def parallelize[T](seq: Seq[T], numSlices: Int = SparkContext.DefaultParallelism): RDD[T] = {
     val slices = if (numSlices <= 0) 1 else numSlices
     new ParallelCollectionRDD[T](this, seq, slices)
   }
 
   def runJob[T, U: ClassTag](rdd: RDD[T], func: Iterator[T] => U): Array[U] = {
-    val parts = rdd.partitions
-    val results = new Array[U](parts.length)
-    var i = 0
-    while (i < parts.length) {
-      val part = parts(i)
-      val context = TaskContext(part.index)
-      results(i) = func(rdd.iterator(part, context))
-      i += 1
-    }
-    results
+    dagScheduler.runJob(rdd, func)
   }
 }
 
